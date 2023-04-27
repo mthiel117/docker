@@ -48,7 +48,11 @@ COPY requirements.yml requirements.yml
 
 RUN pip3 install -r requirements.txt
 
-RUN apt-get update && apt-get install -y google-cloud-cli
+RUN apt-get update && apt-get install -y google-cloud-cli sudo curl
+
+RUN adduser --quiet --disabled-password --shell /bin/zsh --home /home/admin --gecos "User" admin
+
+RUN echo "admin:admin" | chpasswd &&  usermod -aG sudo admin
 
 RUN ansible-galaxy collection install -r requirements.yml --force
 
@@ -64,4 +68,8 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 LABEL maintainer="Mark Thiel <mthiel117@gmail.com>" \
       version="2.0.1"
 
-ENV SHELL /bin/zsh
+USER admin
+ENV TERM xterm
+ENV ZSH_THEME robbyrussell
+
+CMD ["zsh"]
