@@ -13,7 +13,9 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     snapd \
     sudo \
-    wget
+    wget \
+    zsh \
+    git
 
 COPY requirements.txt requirements.txt
 
@@ -23,11 +25,14 @@ RUN pip3 install -r requirements.txt
 
 RUN ansible-galaxy collection install -r requirements.yml --force
 
-RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.5/zsh-in-docker.sh)" -- \
-    -t robbyrussell \
-    -p git \
-    -p ssh-agent \
-    -a 'alias pip="pip3"' \
-    -a 'alias python="python3"'
+# Install Oh My Zsh
+RUN sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 
-ENV SHELL /bin/zsh
+# Optionally, if you want to set the Robby Russell theme explicitly
+# RUN sed -i 's/ZSH_THEME=".*"/ZSH_THEME="robbyrussell"/g' ~/.zshrc
+
+# Set the default shell to zsh
+SHELL ["/bin/zsh", "-c"]
+
+# Set the entrypoint to zsh
+ENTRYPOINT ["/bin/zsh"]
